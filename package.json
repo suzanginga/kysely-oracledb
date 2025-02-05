@@ -1,0 +1,36 @@
+{
+    "name": "kysely-oracledb",
+    "version": "1.0.0",
+    "description": "Kysely Dialect and Type Generator for Oracle DB.",
+    "author": "Griffiths Waite",
+    "license": "MIT",
+    "main": "dist/index.js",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/griffiths-waite/kysely-oracledb"
+    },
+    "scripts": {
+        "build": "tsup src/index.ts --format esm --dts",
+        "lint": "tsc",
+        "test": "vitest"
+    },
+    "devDependencies": {
+        "@changesets/cli": "^2.27.12",
+        "@types/oracledb": "^6.5.3",
+        "prettier": "^3.4.2",
+        "tsup": "^8.3.6",
+        "typescript": "^5.7.3",
+        "vitest": "^3.0.5"
+    },
+    "dependencies": {
+        "kysely": "^0.27.5",
+        "oracledb": "^6.7.1",
+        "uuid": "^11.0.5"
+    }
+}
