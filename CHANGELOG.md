@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.1.3
+
+### Patch Changes
+
+- 67c3f5b: setting publish access to public
+
 ## 1.1.2
 
 ### Patch Changes
