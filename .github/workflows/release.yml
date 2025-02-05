@@ -1,25 +1,25 @@
 name: Create New Release
 on:
-  push:
-    branches:
-      - "main"
+    push:
+        branches:
+            - "main"
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 9.x
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 22.x
-          cache: "pnpm"
-      - run: pnpm install
-      - name: Create New Release
-        uses: changesets/action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: 9.x
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 22.x
+                  cache: "pnpm"
+            - run: pnpm install
+            - name: Create New Release
+              uses: changesets/action@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
