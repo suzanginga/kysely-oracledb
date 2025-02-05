@@ -18,7 +18,8 @@
     "scripts": {
         "build": "tsup src/index.ts --format esm --dts",
         "lint": "tsc",
-        "test": "vitest"
+        "test": "vitest",
+        "release": "pnpm build && changeset publish"
     },
     "devDependencies": {
         "@changesets/cli": "^2.27.12",

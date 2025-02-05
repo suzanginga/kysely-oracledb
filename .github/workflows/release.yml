@@ -1,4 +1,4 @@
-name: Create New Release
+name: Release
 on:
     push:
         branches:
@@ -20,6 +20,10 @@ jobs:
                   cache: "pnpm"
             - run: pnpm install
             - name: Create New Release
+              id: changesets
               uses: changesets/action@v1
+              with:
+                  publish: pnpm release
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
