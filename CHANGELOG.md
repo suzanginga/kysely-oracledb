@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.1.2
+
+### Patch Changes
+
+- 17c9f42: further updates to publishing
+
 ## 1.1.1
 
 ### Patch Changes
