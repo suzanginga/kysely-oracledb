@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.4.0
+
+### Minor Changes
+
+- 67801ff: added unit tests for helper functions
+
 ## 1.3.0
 
 ### Minor Changes
