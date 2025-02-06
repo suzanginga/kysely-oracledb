@@ -1,6 +1,6 @@
 import fs from "fs";
 import { ColumnMetadata, Kysely, TableMetadata } from "kysely";
-import path, { dirname } from "path";
+import path from "path";
 import { format } from "prettier";
 import { fileURLToPath } from "url";
 import { OracleDialect, OracleDialectConfig } from "../dialect/dialect";
@@ -71,16 +71,16 @@ const formatTypes = async (types: string): Promise<string> =>
         semi: true,
     });
 
+const dirname = typeof __dirname !== "undefined" ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+
 // TODO: allow user to specify output path
 const writeToFile = (types: string) => {
-    const __dirname = dirname(fileURLToPath(import.meta.url));
-    const outputPath = path.join(__dirname, "types.ts");
+    const outputPath = path.join(dirname, "types.ts");
     fs.writeFileSync(outputPath, types);
 };
 
 const readFromFile = () => {
-    const __dirname = dirname(fileURLToPath(import.meta.url));
-    const inputPath = path.join(__dirname, "types.ts");
+    const inputPath = path.join(dirname, "types.ts");
     return fs.readFileSync(inputPath, "utf8");
 };
 
