@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.2.1
+
+### Patch Changes
+
+- f7d254d: fixing bundle size issue
+
 ## 1.2.0
 
 ### Minor Changes
