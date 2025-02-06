@@ -15,6 +15,12 @@
         "type": "git",
         "url": "https://github.com/griffiths-waite/kysely-oracledb"
     },
+    "keywords": [
+        "sql",
+        "kysely",
+        "dialect",
+        "oracledb"
+    ],
     "scripts": {
         "build": "tsup src/index.ts --format esm --dts",
         "lint": "tsc",
