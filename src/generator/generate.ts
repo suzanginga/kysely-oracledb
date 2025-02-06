@@ -17,6 +17,7 @@ interface TableTypes {
 
 const warningComment = `// This file was generated automatically. Please don't edit it manually!`;
 const generationComment = `// Timestamp: ${new Date().toISOString()}`;
+const kyselyImport = `import type { Insertable, Selectable, Updateable } from 'kysely'`;
 
 const generateFieldTypes = (fields: ColumnMetadata[]): string => {
     const fieldStrings = fields.map((field) => {
@@ -52,11 +53,10 @@ const generateTableTypes = (tables: TableMetadata[]): TableTypes[] => {
 
 const generateDatabaseTypes = (tableTypes: TableTypes[]): string => {
     const tableTypesString = tableTypes.map(({ types }) => `${types}\n`).join("\n");
-    const databaseString = [`\nexport interface DB {`];
-    databaseString.push(...tableTypes.map(({ table, tableTypeName }) => `${table}: ${tableTypeName}`), "}");
-    return `${warningComment}\n${generationComment}\n\nimport type { Insertable, Selectable, Updateable } from 'kysely'\n\n${tableTypesString}\n${databaseString.join(
-        "\n",
-    )}`;
+    const exportString = ["export interface DB {"];
+    exportString.push(...tableTypes.map(({ table, tableTypeName }) => `${table}: ${tableTypeName}`), "}");
+    const importString = `${warningComment}\n${generationComment}\n\n${kyselyImport}`;
+    return `${importString}\n\n${tableTypesString}\n\n${exportString.join("\n")}`;
 };
 
 // TODO: allow user to pass in prettier options
@@ -91,7 +91,7 @@ const checkDiff = (existingContent: string, newContent: string) => {
     return !!diff || existingLines.length !== newLines.length;
 };
 
-export const generateTypes = async (config: OracleDialectConfig) => {
+export const generate = async (config: OracleDialectConfig) => {
     const log = config.logger ? config.logger : defaultLogger;
     try {
         const dialect = new OracleDialect(config);

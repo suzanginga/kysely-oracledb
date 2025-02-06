@@ -24,12 +24,13 @@
     "scripts": {
         "build": "tsup",
         "lint": "tsc",
-        "test": "vitest",
+        "test": "vitest --coverage",
         "release": "pnpm build && changeset publish"
     },
     "devDependencies": {
         "@changesets/cli": "^2.27.12",
         "@types/oracledb": "^6.5.3",
+        "@vitest/coverage-istanbul": "3.0.5",
         "tsup": "^8.3.6",
         "typescript": "^5.7.3",
         "vitest": "^3.0.5"
