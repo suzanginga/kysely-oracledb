@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.2.0
+
+### Minor Changes
+
+- f673abf: added type generator
+
 ## 1.1.3
 
 ### Patch Changes
