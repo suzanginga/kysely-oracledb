@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.3.0
+
+### Minor Changes
+
+- ff5cc47: added cjs bundle and fixed esm imports
+
 ## 1.2.1
 
 ### Patch Changes
