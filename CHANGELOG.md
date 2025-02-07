@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.6.0
+
+### Minor Changes
+
+- e5e37ca: added new options for prettier and filepath config
+
 ## 1.5.0
 
 ### Minor Changes
