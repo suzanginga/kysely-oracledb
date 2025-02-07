@@ -30,7 +30,8 @@ To use the Dialect with Kysely, you will need to pass in an Oracle DB `Pool` to 
 
 ```typescript
 // See the section below for more information on generating types.
-import { DB } from "./types.ts";
+import type { DB } from "./types.ts";
+
 import oracledb from "oracledb";
 import { Kysely } from "kysely";
 import { OracleDialect } from "kysely-oracledb";
@@ -46,10 +47,32 @@ const db = new Kysely<DB>({
 });
 ```
 
-You can now use the `db` instance to query your Oracle DB database.
+You can now use the `db` instance to query your Oracle database.
 
 ```typescript
-const users = await db.from("users").select("id", "name").where("id", 1).execute();
+const users = await db
+    .from("users")
+    .select("id", "name")
+    .where("id", 1)
+    .execute();
+```
+
+For functions that are specific to Oracle DB, you can use the template tag to execute raw SQL. For example, to use the `ROUND` function:
+
+```typescript
+// See the section below for more information on generating types.
+import type { DB } from "./types.ts";
+import type { ExpressionWrapper } from "kysely";
+
+const round = (
+    number: ExpressionWrapper<DB, keyof DB, number>,
+    decimals: number,
+) => sql<number>`round(${number},${decimals})`;
+
+const products = await db
+    .from("products")
+    .select("id", round("price", 2).as("price"))
+    .execute();
 ```
 
 ### Dialect Configuration
@@ -78,14 +101,33 @@ await generate({
 });
 ```
 
+This will generate a types file with the following structure:
+
+```typescript
+import type { Insertable, Selectable, Updateable } from "kysely";
+
+interface UserTable {
+    id: number;
+    name: string;
+}
+
+export type User = Selectable<UserTable>;
+export type NewUser = Insertable<UserTable>;
+export type UserUpdate = Updateable<UserTable>;
+
+export interface DB {
+    user: User;
+}
+```
+
 ### Generator Configuration
 
 The generator can be configured with the same options as the dialect, plus the following additional options:
 
 | Option            | Type               | Description                                                     | Required |
 | ----------------- | ------------------ | --------------------------------------------------------------- | -------- |
-| `schemas`         | `string[]`         | List of schemas to limit type generation to.                    | No       |
-| `tables`          | `string[]`         | List of tables to limit type generation to.                     | No       |
+| `schemas`         | `string[]`         | List of schemas to scope type generation.                       | No       |
+| `tables`          | `string[]`         | List of tables to scope type generation.                        | No       |
 | `camelCase`       | `boolean`          | Convert database table names and columns to camel case.         | No       |
 | `checkDiff`       | `boolean`          | Check for differences against existing types before generating. | No       |
 | `filePath`        | `string`           | File path to write the types to.                                | No       |
@@ -106,7 +148,10 @@ await generate({
         connectionString: "connection-string",
     }),
     generator: {
-        filePath: path.join(path.dirname(fileURLToPath(import.meta.url)), "db-types.ts"),
+        filePath: path.join(
+            path.dirname(fileURLToPath(import.meta.url)),
+            "db-types.ts",
+        ),
     },
 });
 ```
