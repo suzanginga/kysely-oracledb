@@ -1,8 +1,7 @@
 import fs from "fs";
 import { CamelCasePlugin, ColumnMetadata, Kysely, TableMetadata } from "kysely";
 import path from "path";
-import { format } from "prettier";
-import { fileURLToPath } from "url";
+import { format, Options } from "prettier";
 import { OracleDialect, OracleDialectConfig } from "../dialect/dialect";
 import { IntropsectorDB } from "../dialect/introspector";
 import { defaultLogger } from "../dialect/logger";
@@ -59,29 +58,26 @@ const generateDatabaseTypes = (tableTypes: TableTypes[]): string => {
     return `${importString}\n\n${tableTypesString}\n\n${exportString.join("\n")}`;
 };
 
-// TODO: allow user to pass in prettier options
-const formatTypes = async (types: string): Promise<string> =>
-    await format(types, {
-        parser: "typescript",
-        singleQuote: true,
-        trailingComma: "all",
-        endOfLine: "auto",
-        tabWidth: 4,
-        printWidth: 120,
-        semi: true,
-    });
+const formatTypes = async (types: string, options?: Options): Promise<string> =>
+    await format(
+        types,
+        options || {
+            parser: "typescript",
+            singleQuote: true,
+            trailingComma: "all",
+            endOfLine: "auto",
+            tabWidth: 4,
+            printWidth: 120,
+            semi: true,
+        },
+    );
 
-const dirname = typeof __dirname !== "undefined" ? __dirname : path.dirname(fileURLToPath(import.meta.url));
-
-// TODO: allow user to specify output path
-const writeToFile = (types: string) => {
-    const outputPath = path.join(dirname, "types.ts");
-    fs.writeFileSync(outputPath, types);
+const writeToFile = (types: string, path: string) => {
+    fs.writeFileSync(path, types);
 };
 
-const readFromFile = () => {
-    const inputPath = path.join(dirname, "types.ts");
-    return fs.readFileSync(inputPath, "utf8");
+const readFromFile = (path: string) => {
+    return fs.readFileSync(path, "utf8");
 };
 
 const checkDiff = (existingContent: string, newContent: string) => {
@@ -103,21 +99,23 @@ export const generate = async (config: OracleDialectConfig) => {
         const tableTypes = generateTableTypes(tables, config.generator?.camelCase);
         const databaseTypes = generateDatabaseTypes(tableTypes);
 
-        const formattedTypes = await formatTypes(databaseTypes);
+        const formattedTypes = await formatTypes(databaseTypes, config?.generator?.prettierOptions);
+
+        const filePath = config.generator?.filePath || path.join(process.cwd(), "types.ts");
 
         if (config.generator?.checkDiff) {
-            const existingTypes = readFromFile();
+            const existingTypes = readFromFile(filePath);
             const diff = checkDiff(existingTypes, formattedTypes);
             if (diff) {
                 log.warn("Types have changed. Updating types file...");
-                writeToFile(formattedTypes);
+                writeToFile(formattedTypes, filePath);
                 await db.destroy();
                 log.info("Types updated successfully");
             } else {
                 log.info("Types have not changed");
             }
         } else {
-            writeToFile(formattedTypes);
+            writeToFile(formattedTypes, filePath);
             log.info("Types updated successfully");
         }
     } catch (err) {
