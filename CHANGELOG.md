@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.6.3
+
+### Patch Changes
+
+- bf5603a: added new generator unit tests and readme updated
+
 ## 1.6.2
 
 ### Patch Changes
