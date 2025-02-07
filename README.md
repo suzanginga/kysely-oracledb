@@ -26,26 +26,22 @@ yarn add kysely-oracledb
 
 ### Oracle DB Dialect
 
-To use the Dialect with Kysely, you will need to configure the `OracleDialect` with your Oracle DB connection pool. You can either pass in the pool directly or a function that returns the pool.
+To use the Dialect with Kysely, you will need to pass in an Oracle DB `Pool` to the `OracleDialect` constructor.
 
 ```typescript
 // See the section below for more information on generating types.
 import { DB } from "./types.ts";
+import oracledb from "oracledb";
 import { Kysely } from "kysely";
 import { OracleDialect } from "kysely-oracledb";
-import oracledb from "oracledb";
-
-const createPool = async () => {
-    return await oracledb.createPool({
-        user: "your-username",
-        password: "your-password",
-        connectionString: "your-connection-string",
-    });
-};
 
 const db = new Kysely<DB>({
     dialect: new OracleDialect({
-        pool: createPool,
+        pool: await oracledb.createPool({
+            user: "user",
+            password: "pass",
+            connectionString: "connection-string",
+        }),
     }),
 });
 ```
@@ -54,31 +50,25 @@ const db = new Kysely<DB>({
 
 The dialect can be configured by passing in the following options:
 
-| Option    | Type                                     | Description                                | Required |
-| --------- | ---------------------------------------- | ------------------------------------------ | -------- |
-| `pool`    | `oracledb.Pool` or `() => oracle.dbPool` | Oracle DB connection pool.                 | Yes      |
-| `schemas` | `string[]`                               | List of schemas to limit introspection to. | No       |
-| `tables`  | `string[]`                               | List of tables to limit introspection to.  | No       |
-| `logger`  | `Logger`                                 | Logger instance for debug messages.        | No       |
+| Option   | Type            | Description                         | Required |
+| -------- | --------------- | ----------------------------------- | -------- |
+| `pool`   | `oracledb.Pool` | Oracle DB connection pool.          | Yes      |
+| `logger` | `Logger`        | Logger instance for debug messages. | No       |
 
 ### Type Generation
 
 Kysely requires you to define the types for your database schema. You can define these manually or you can generate them using the `generate` function.
 
 ```typescript
-import { generate } from "kysely-oracledb";
 import oracledb from "oracledb";
-
-const createPool = async () => {
-    return await oracledb.createPool({
-        user: "your-username",
-        password: "your-password",
-        connectionString: "your-connection-string",
-    });
-};
+import { generate } from "kysely-oracledb";
 
 await generate({
-    pool: createPool,
+    pool: await oracledb.createPool({
+        user: "user",
+        password: "pass",
+        connectionString: "connection-string",
+    }),
 });
 ```
 
@@ -88,10 +78,32 @@ The generator can be configured with the same options as the dialect, plus the f
 
 | Option            | Type               | Description                                                     | Required |
 | ----------------- | ------------------ | --------------------------------------------------------------- | -------- |
+| `schemas`         | `string[]`         | List of schemas to limit introspection to.                      | No       |
+| `tables`          | `string[]`         | List of tables to limit introspection to.                       | No       |
 | `camelCase`       | `boolean`          | Convert databas schema to camelCase.                            | No       |
 | `checkDiff`       | `boolean`          | Check for differences against existing types before generating. | No       |
 | `filePath`        | `string`           | File path to write the types to.                                | No       |
 | `prettierOptions` | `prettier.Options` | Prettier options for formatting.                                | No       |
+
+By default the types will be written to `types.ts` in the current working directory. You can change this by passing in a `filePath` option:
+
+```typescript
+import path from "path";
+import oracledb from "oracledb";
+import { fileURLToPath } from "url";
+import { generate } from "kysely-oracledb";
+
+await generate({
+    pool: await oracledb.createPool({
+        user: "user",
+        password: "pass",
+        connectionString: "connection-string",
+    }),
+    generator: {
+        filePath: path.join(path.dirname(fileURLToPath(import.meta.url)), "db-types.ts"),
+    },
+});
+```
 
 ## Contributing
 

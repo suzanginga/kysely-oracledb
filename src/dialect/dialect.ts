@@ -8,11 +8,11 @@ import { Logger } from "./logger";
 import { OracleQueryCompiler } from "./query-compiler";
 
 export interface OracleDialectConfig {
-    pool: Pool | ((opts?: any) => Promise<Pool>);
-    schemas?: string[];
-    tables?: string[];
+    pool: Pool;
     logger?: Logger;
     generator?: {
+        schemas?: string[];
+        tables?: string[];
         camelCase?: boolean;
         checkDiff?: boolean;
         filePath?: string;

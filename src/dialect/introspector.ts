@@ -48,8 +48,8 @@ export class OracleIntrospector implements DatabaseIntrospector {
             .select("username")
             .where((eb) =>
                 eb.or([
-                    eb(eb.val(this.#config?.schemas?.length ?? 0), "=", eb.val(0)),
-                    eb("username", "in", this.#config?.schemas ?? [null]),
+                    eb(eb.val(this.#config?.generator?.schemas?.length ?? 0), "=", eb.val(0)),
+                    eb("username", "in", this.#config?.generator?.schemas ?? [null]),
                 ]),
             )
             .fetch(999) // Oracle has a limit of 999 parameters for the IN clause
@@ -66,8 +66,8 @@ export class OracleIntrospector implements DatabaseIntrospector {
             .where("owner", "in", schemas)
             .where((eb) =>
                 eb.or([
-                    eb(eb.val(this.#config?.tables?.length ?? 0), "=", eb.val(0)),
-                    eb("tableName", "in", this.#config?.tables ?? [null]),
+                    eb(eb.val(this.#config?.generator?.tables?.length ?? 0), "=", eb.val(0)),
+                    eb("tableName", "in", this.#config?.generator?.tables ?? [null]),
                 ]),
             )
             .fetch(999) // Oracle has a limit of 999 parameters for the IN clause
