@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.6.2
+
+### Patch Changes
+
+- ce17725: updated readme
+
 ## 1.6.1
 
 ### Patch Changes
