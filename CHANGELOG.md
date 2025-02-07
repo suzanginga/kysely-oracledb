@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.5.0
+
+### Minor Changes
+
+- 4b5374f: added option to configure camelcase and generate diff check
+
 ## 1.4.0
 
 ### Minor Changes
