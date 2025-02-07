@@ -46,6 +46,12 @@ const db = new Kysely<DB>({
 });
 ```
 
+You can now use the `db` instance to query your Oracle DB database.
+
+```typescript
+const users = await db.from("users").select("id", "name").where("id", 1).execute();
+```
+
 ### Dialect Configuration
 
 The dialect can be configured by passing in the following options:
@@ -78,14 +84,14 @@ The generator can be configured with the same options as the dialect, plus the f
 
 | Option            | Type               | Description                                                     | Required |
 | ----------------- | ------------------ | --------------------------------------------------------------- | -------- |
-| `schemas`         | `string[]`         | List of schemas to limit introspection to.                      | No       |
-| `tables`          | `string[]`         | List of tables to limit introspection to.                       | No       |
-| `camelCase`       | `boolean`          | Convert databas schema to camelCase.                            | No       |
+| `schemas`         | `string[]`         | List of schemas to limit type generation to.                    | No       |
+| `tables`          | `string[]`         | List of tables to limit type generation to.                     | No       |
+| `camelCase`       | `boolean`          | Convert database table names and columns to camel case.         | No       |
 | `checkDiff`       | `boolean`          | Check for differences against existing types before generating. | No       |
 | `filePath`        | `string`           | File path to write the types to.                                | No       |
 | `prettierOptions` | `prettier.Options` | Prettier options for formatting.                                | No       |
 
-By default the types will be written to `types.ts` in the current working directory. You can change this by passing in a `filePath` option:
+By default the types will be written to `types.ts` in the current working directory. You can change this with the `filePath` option:
 
 ```typescript
 import path from "path";
