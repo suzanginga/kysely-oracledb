@@ -11,6 +11,10 @@ export interface OracleDialectConfig {
     schemas?: string[];
     tables?: string[];
     logger?: Logger;
+    generator?: {
+        camelCase?: boolean;
+        checkDiff?: boolean;
+    };
 }
 
 export class OracleDialect implements Dialect {

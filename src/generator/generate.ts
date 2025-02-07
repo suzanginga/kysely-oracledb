@@ -1,5 +1,5 @@
 import fs from "fs";
-import { ColumnMetadata, Kysely, TableMetadata } from "kysely";
+import { CamelCasePlugin, ColumnMetadata, Kysely, TableMetadata } from "kysely";
 import path from "path";
 import { format } from "prettier";
 import { fileURLToPath } from "url";
@@ -34,9 +34,9 @@ const generateFieldTypes = (fields: ColumnMetadata[]): string => {
     return fieldStrings.join("\n");
 };
 
-const generateTableTypes = (tables: TableMetadata[]): TableTypes[] => {
+const generateTableTypes = (tables: TableMetadata[], useCamelCase = false): TableTypes[] => {
     return tables.map((table) => {
-        const originalTableName = camelCase(table.name);
+        const originalTableName = useCamelCase ? camelCase(table.name) : table.name;
         const pascalCaseTable = pascalCase(table.name);
         return {
             table: originalTableName,
@@ -95,26 +95,30 @@ export const generate = async (config: OracleDialectConfig) => {
     const log = config.logger ? config.logger : defaultLogger;
     try {
         const dialect = new OracleDialect(config);
-        const db = new Kysely<IntropsectorDB>({ dialect });
+        const db = new Kysely<IntropsectorDB>({ dialect, plugins: [new CamelCasePlugin()] });
         const introspector = dialect.createIntrospector(db);
 
         const tables = await introspector.getTables();
 
-        const tableTypes = generateTableTypes(tables);
+        const tableTypes = generateTableTypes(tables, config.generator?.camelCase);
         const databaseTypes = generateDatabaseTypes(tableTypes);
 
         const formattedTypes = await formatTypes(databaseTypes);
-        const existingTypes = readFromFile();
 
-        const diff = checkDiff(existingTypes, formattedTypes);
-
-        if (diff) {
-            log.warn("Types have changed. Updating types file...");
-            writeToFile(formattedTypes);
-            await db.destroy();
-            log.info("Types updated successfully");
+        if (config.generator?.checkDiff) {
+            const existingTypes = readFromFile();
+            const diff = checkDiff(existingTypes, formattedTypes);
+            if (diff) {
+                log.warn("Types have changed. Updating types file...");
+                writeToFile(formattedTypes);
+                await db.destroy();
+                log.info("Types updated successfully");
+            } else {
+                log.info("Types have not changed");
+            }
         } else {
-            log.info("Types have not changed");
+            writeToFile(formattedTypes);
+            log.info("Types updated successfully");
         }
     } catch (err) {
         log.error({ err }, "Error generating types");
