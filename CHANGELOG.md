@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.6.1
+
+### Patch Changes
+
+- d655283: updated config options for dialect and generator
+
 ## 1.6.0
 
 ### Minor Changes
