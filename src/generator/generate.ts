@@ -18,7 +18,7 @@ const warningComment = `// This file was generated automatically. Please don't e
 const generationComment = `// Timestamp: ${new Date().toISOString()}`;
 const kyselyImport = `import type { Insertable, Selectable, Updateable } from 'kysely'`;
 
-const generateFieldTypes = (fields: ColumnMetadata[]): string => {
+export const generateFieldTypes = (fields: ColumnMetadata[], useCamelCase = false): string => {
     const fieldStrings = fields.map((field) => {
         const type = typeMap[field.dataType];
         if (!type) {
@@ -28,29 +28,28 @@ const generateFieldTypes = (fields: ColumnMetadata[]): string => {
         if (field.isNullable) {
             types.push("null");
         }
-        return `${camelCase(field.name)}: ${types.join(" | ")}`;
+        return `${useCamelCase ? camelCase(field.name) : field.name}: ${types.join(" | ")}`;
     });
     return fieldStrings.join("\n");
 };
 
-const generateTableTypes = (tables: TableMetadata[], useCamelCase = false): TableTypes[] => {
+export const generateTableTypes = (tables: TableMetadata[], useCamelCase = false): TableTypes[] => {
     return tables.map((table) => {
         const originalTableName = useCamelCase ? camelCase(table.name) : table.name;
         const pascalCaseTable = pascalCase(table.name);
+        const tableString = `interface ${pascalCaseTable}Table {\n${generateFieldTypes(table.columns, useCamelCase)}\n}`;
+        const selectString = `export type ${pascalCaseTable} = Selectable<${pascalCaseTable}Table>`;
+        const insertString = `export type New${pascalCaseTable} = Insertable<${pascalCaseTable}Table>`;
+        const updateString = `export type ${pascalCaseTable}Update = Updateable<${pascalCaseTable}Table>`;
         return {
             table: originalTableName,
             tableTypeName: pascalCaseTable,
-            types: `interface ${pascalCaseTable}Table {
-                  ${generateFieldTypes(table.columns)}
-              }
-              export type ${pascalCaseTable} = Selectable<${pascalCaseTable}Table>
-              export type New${pascalCaseTable} = Insertable<${pascalCaseTable}Table>
-              export type ${pascalCaseTable}Update = Updateable<${pascalCaseTable}Table>\n`,
+            types: `${tableString}\n${selectString}\n${insertString}\n${updateString}\n`,
         };
     });
 };
 
-const generateDatabaseTypes = (tableTypes: TableTypes[]): string => {
+export const generateDatabaseTypes = (tableTypes: TableTypes[]): string => {
     const tableTypesString = tableTypes.map(({ types }) => `${types}\n`).join("\n");
     const exportString = ["export interface DB {"];
     exportString.push(...tableTypes.map(({ table, tableTypeName }) => `${table}: ${tableTypeName}`), "}");
@@ -80,7 +79,7 @@ const readFromFile = (path: string) => {
     return fs.readFileSync(path, "utf8");
 };
 
-const checkDiff = (existingContent: string, newContent: string) => {
+export const checkDiff = (existingContent: string, newContent: string) => {
     const existingLines = existingContent.split("\n").slice(2);
     const newLines = newContent.split("\n").slice(2);
     const diff = newLines.find((line, index) => line !== existingLines[index]);

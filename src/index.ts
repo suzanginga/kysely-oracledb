@@ -1,7 +1,8 @@
-export * from "./dialect/adapter";
-export * from "./dialect/connection";
-export * from "./dialect/dialect";
-export * from "./dialect/driver";
-export * from "./dialect/introspector";
-export * from "./dialect/query-compiler";
-export * from "./generator/generate";
+export { OracleAdapter } from "./dialect/adapter";
+export { OracleConnection } from "./dialect/connection";
+export { OracleDialect } from "./dialect/dialect";
+export type { OracleDialectConfig } from "./dialect/dialect";
+export { OracleDriver } from "./dialect/driver";
+export { OracleIntrospector } from "./dialect/introspector";
+export { OracleQueryCompiler } from "./dialect/query-compiler";
+export { generate } from "./generator/generate";
