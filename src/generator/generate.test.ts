@@ -1,5 +1,16 @@
-import { describe, expect, it } from "vitest";
-import { generateFieldTypes, generateTableTypes } from "./generate";
+import fs from "fs";
+import oracledb from "oracledb";
+import path from "path";
+import { fileURLToPath } from "url";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    checkDiff,
+    formatTypes,
+    generate,
+    generateDatabaseTypes,
+    generateFieldTypes,
+    generateTableTypes,
+} from "./generate";
 
 describe("generateFieldTypes", () => {
     it("should generate type string for single field", () => {
@@ -108,7 +119,20 @@ describe("generate table types", () => {
             {
                 table: "user",
                 tableTypeName: "User",
-                types: `interface UserTable {\nid: number\nname: string\n}\nexport type User = Selectable<UserTable>\nexport type NewUser = Insertable<UserTable>\nexport type UserUpdate = Updateable<UserTable>\n`,
+                types:
+                    "interface UserTable {" +
+                    "\n" +
+                    "id: number" +
+                    "\n" +
+                    "name: string" +
+                    "\n" +
+                    "}" +
+                    "\n" +
+                    "export type User = Selectable<UserTable>" +
+                    "\n" +
+                    "export type NewUser = Insertable<UserTable>" +
+                    "\n" +
+                    "export type UserUpdate = Updateable<UserTable>",
             },
         ]);
     });
@@ -167,13 +191,175 @@ describe("generate table types", () => {
             {
                 table: "user",
                 tableTypeName: "User",
-                types: `interface UserTable {\nid: number\nname: string\n}\nexport type User = Selectable<UserTable>\nexport type NewUser = Insertable<UserTable>\nexport type UserUpdate = Updateable<UserTable>\n`,
+                types:
+                    "interface UserTable {" +
+                    "\n" +
+                    "id: number" +
+                    "\n" +
+                    "name: string" +
+                    "\n" +
+                    "}" +
+                    "\n" +
+                    "export type User = Selectable<UserTable>" +
+                    "\n" +
+                    "export type NewUser = Insertable<UserTable>" +
+                    "\n" +
+                    "export type UserUpdate = Updateable<UserTable>",
             },
             {
                 table: "product",
                 tableTypeName: "Product",
-                types: `interface ProductTable {\nid: number\nproduct: string\nprice: number | null\n}\nexport type Product = Selectable<ProductTable>\nexport type NewProduct = Insertable<ProductTable>\nexport type ProductUpdate = Updateable<ProductTable>\n`,
+                types:
+                    "interface ProductTable {" +
+                    "\n" +
+                    "id: number" +
+                    "\n" +
+                    "product: string" +
+                    "\n" +
+                    "price: number | null" +
+                    "\n" +
+                    "}" +
+                    "\n" +
+                    "export type Product = Selectable<ProductTable>" +
+                    "\n" +
+                    "export type NewProduct = Insertable<ProductTable>" +
+                    "\n" +
+                    "export type ProductUpdate = Updateable<ProductTable>",
             },
         ]);
+    });
+    it("should generate table types for single camel case table", () => {
+        expect(
+            generateTableTypes(
+                [
+                    {
+                        name: "user_profile",
+                        isView: false,
+                        columns: [
+                            {
+                                name: "id",
+                                dataType: "NUMBER",
+                                isNullable: false,
+                                hasDefaultValue: false,
+                                isAutoIncrementing: true,
+                            },
+                            {
+                                name: "name",
+                                dataType: "VARCHAR2",
+                                isNullable: false,
+                                hasDefaultValue: false,
+                                isAutoIncrementing: false,
+                            },
+                        ],
+                    },
+                ],
+                true,
+            ),
+        ).toEqual([
+            {
+                table: "userProfile",
+                tableTypeName: "UserProfile",
+                types:
+                    "interface UserProfileTable {" +
+                    "\n" +
+                    "id: number" +
+                    "\n" +
+                    "name: string" +
+                    "\n" +
+                    "}" +
+                    "\n" +
+                    "export type UserProfile = Selectable<UserProfileTable>" +
+                    "\n" +
+                    "export type NewUserProfile = Insertable<UserProfileTable>" +
+                    "\n" +
+                    "export type UserProfileUpdate = Updateable<UserProfileTable>",
+            },
+        ]);
+    });
+});
+
+describe("generateDatabaseTypes", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date(2025, 0, 1));
+    });
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+    it("should generate database types for single table", () => {
+        expect(generateDatabaseTypes([{ table: "user", tableTypeName: "User", types: "types string" }])).toBe(
+            "// This file was generated automatically. Please don't edit it manually!" +
+                "\n" +
+                "// Timestamp: 2025-01-01T00:00:00.000Z" +
+                "\n\n" +
+                "import type { Insertable, Selectable, Updateable } from 'kysely'" +
+                "\n\n" +
+                "types string" +
+                "\n\n" +
+                "export interface DB {" +
+                "\n" +
+                "user: User" +
+                "\n" +
+                "}",
+        );
+    });
+});
+
+describe("formatTypes", () => {
+    it("should format types using default prettier options", async () => {
+        const types = "interface UserTable { id: number; name: string } export type User = Selectable<UserTable>";
+        expect(await formatTypes(types)).toBe(
+            "interface UserTable {" +
+                "\n" +
+                "    id: number;" +
+                "\n" +
+                "    name: string;" +
+                "\n" +
+                "}" +
+                "\n" +
+                "export type User = Selectable<UserTable>;\n",
+        );
+    });
+});
+
+describe("checkDiff", () => {
+    it("should return true if there is a diff", () => {
+        expect(checkDiff("line1\nline2\nline3", "line1\nline2\nline4")).toBe(true);
+    });
+    it("should not return true if there is no diff", () => {
+        expect(checkDiff("line1\nline2\nline3", "line1\nline2\nline3")).toBe(false);
+    });
+    it("should not return true if there is only a diff in line 1 or 2 (comments)", () => {
+        expect(checkDiff("line1\nline2\nline3", "line1\nline3\nline3")).toBe(false);
+    });
+    it("should return true if there are > lines", () => {
+        expect(checkDiff("line1\nline2\nline3", "line1\nline2\nline3\nline4")).toBe(true);
+    });
+    it("should return true if there are < lines", () => {
+        expect(checkDiff("line1\nline2\nline3", "line1\nline2")).toBe(true);
+    });
+});
+
+describe("generate", () => {
+    it("should generate types for a single table", async () => {
+        const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "types.ts");
+        expect(fs.existsSync(filePath)).toBe(false);
+        await generate({
+            pool: await oracledb.createPool({
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                connectionString: process.env.DB_CONNECTION_STRING,
+                poolAlias: process.env.DB_POOL_ALIAS,
+            }),
+            generator: {
+                schemas: ["SYS"],
+                tables: ["DUAL"],
+                checkDiff: true,
+                filePath: filePath,
+            },
+        });
+        expect(fs.existsSync(filePath)).toBe(true);
+        fs.unlinkSync(filePath);
+        expect(fs.existsSync(filePath)).toBe(false);
     });
 });
