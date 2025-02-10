@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.6.4
+
+### Patch Changes
+
+- 3c6784a: generator formatting tweaks
+
 ## 1.6.3
 
 ### Patch Changes
