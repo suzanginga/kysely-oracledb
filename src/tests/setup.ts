@@ -1,6 +1,8 @@
-import "dotenv/config";
+import { vi } from "vitest";
 
 process.env = {
     ...process.env,
-    DB_POOL_ALIAS: "kysely-test",
+    DB_USER: "test_user",
 };
+
+vi.mock("oracledb");

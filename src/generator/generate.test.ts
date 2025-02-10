@@ -341,15 +341,42 @@ describe("checkDiff", () => {
 });
 
 describe("generate", () => {
+    vi.mock(import("../dialect/dialect"), () => {
+        const OracleDialect = vi.fn();
+        OracleDialect.prototype.createDriver = vi.fn();
+        OracleDialect.prototype.createAdapter = vi.fn();
+        OracleDialect.prototype.createQueryCompiler = vi.fn();
+        OracleDialect.prototype.createIntrospector = vi.fn(() => {
+            return {
+                getTables: vi.fn(async () =>
+                    Promise.resolve([
+                        {
+                            name: "DUAL",
+                            isView: false,
+                            columns: [
+                                {
+                                    owner: "SYS",
+                                    tableName: "DUAL",
+                                    columnName: "DUMMY",
+                                    dataType: "VARCHAR2",
+                                    nullable: "Y",
+                                    dataDefault: null,
+                                },
+                            ],
+                            schema: "SYS",
+                        },
+                    ]),
+                ),
+            };
+        });
+        return { OracleDialect };
+    });
     it("should generate types for a single table", async () => {
         const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "types.ts");
         expect(fs.existsSync(filePath)).toBe(false);
         await generate({
             pool: await oracledb.createPool({
                 user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                connectionString: process.env.DB_CONNECTION_STRING,
-                poolAlias: process.env.DB_POOL_ALIAS,
             }),
             generator: {
                 schemas: ["SYS"],
