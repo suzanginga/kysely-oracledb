@@ -15,8 +15,8 @@ interface TableTypes {
 }
 
 const warningComment = `// This file was generated automatically. Please don't edit it manually!`;
-const generationComment = `// Timestamp: ${new Date().toISOString()}`;
 const kyselyImport = `import type { Insertable, Selectable, Updateable } from 'kysely'`;
+const generationComment = (date: string) => `// Timestamp: ${date}`;
 
 export const generateFieldTypes = (fields: ColumnMetadata[], useCamelCase = false): string => {
     const fieldStrings = fields.map((field) => {
@@ -44,20 +44,20 @@ export const generateTableTypes = (tables: TableMetadata[], useCamelCase = false
         return {
             table: originalTableName,
             tableTypeName: pascalCaseTable,
-            types: `${tableString}\n${selectString}\n${insertString}\n${updateString}\n`,
+            types: `${tableString}\n${selectString}\n${insertString}\n${updateString}`,
         };
     });
 };
 
 export const generateDatabaseTypes = (tableTypes: TableTypes[]): string => {
-    const tableTypesString = tableTypes.map(({ types }) => `${types}\n`).join("\n");
+    const tableTypesString = tableTypes.map(({ types }) => types).join("\n\n");
     const exportString = ["export interface DB {"];
     exportString.push(...tableTypes.map(({ table, tableTypeName }) => `${table}: ${tableTypeName}`), "}");
-    const importString = `${warningComment}\n${generationComment}\n\n${kyselyImport}`;
+    const importString = `${warningComment}\n${generationComment(new Date().toISOString())}\n\n${kyselyImport}`;
     return `${importString}\n\n${tableTypesString}\n\n${exportString.join("\n")}`;
 };
 
-const formatTypes = async (types: string, options?: Options): Promise<string> =>
+export const formatTypes = async (types: string, options?: Options): Promise<string> =>
     await format(
         types,
         options || {
@@ -100,13 +100,20 @@ export const generate = async (config: OracleDialectConfig) => {
 
         const formattedTypes = await formatTypes(databaseTypes, config?.generator?.prettierOptions);
 
-        const filePath = config.generator?.filePath || path.join(process.cwd(), "types.ts");
+        const filePath = config.generator?.filePath || path.join(process.cwd(), "types.test.ts");
 
         if (config.generator?.checkDiff) {
-            const existingTypes = readFromFile(filePath);
-            const diff = checkDiff(existingTypes, formattedTypes);
+            let diff = true;
+            try {
+                const existingTypes = readFromFile(filePath);
+                const diff = checkDiff(existingTypes, formattedTypes);
+                if (diff) {
+                    log.warn("Types have changed. Updating types file...");
+                }
+            } catch (err) {
+                log.warn("Types file not found. Creating a new one...");
+            }
             if (diff) {
-                log.warn("Types have changed. Updating types file...");
                 writeToFile(formattedTypes, filePath);
                 await db.destroy();
                 log.info("Types updated successfully");

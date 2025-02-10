@@ -72,7 +72,12 @@ export class OracleIntrospector implements DatabaseIntrospector {
             )
             .fetch(999) // Oracle has a limit of 999 parameters for the IN clause
             .execute();
-        rawTables.push(dualTable);
+        const hasDualTable = rawTables.some(
+            (table) => table.owner === dualTable.owner && table.tableName === dualTable.tableName,
+        );
+        if (!hasDualTable) {
+            rawTables.push(dualTable);
+        }
         const rawColumns = await this.#db
             .selectFrom("allTabColumns")
             .select(["owner", "tableName", "columnName", "dataType", "nullable", "dataDefault"])
