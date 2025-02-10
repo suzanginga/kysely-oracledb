@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.6.5
+
+### Patch Changes
+
+- d69a539: fixed issue with camel case util when fields contain numbers
+
 ## 1.6.4
 
 ### Patch Changes
