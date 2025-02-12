@@ -126,7 +126,7 @@ export type NewUser = Insertable<UserTable>;
 export type UserUpdate = Updateable<UserTable>;
 
 export interface DB {
-    user: User;
+    user: UserTable;
 }
 ```
 
