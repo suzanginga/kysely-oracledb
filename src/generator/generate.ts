@@ -53,7 +53,7 @@ export const generateTableTypes = (tables: TableMetadata[], useCamelCase = false
 export const generateDatabaseTypes = (tableTypes: TableTypes[]): string => {
     const tableTypesString = tableTypes.map(({ types }) => types).join("\n\n");
     const exportString = ["export interface DB {"];
-    exportString.push(...tableTypes.map(({ table, tableTypeName }) => `${table}: ${tableTypeName}`), "}");
+    exportString.push(...tableTypes.map(({ table, tableTypeName }) => `${table}: ${tableTypeName}Table`), "}");
     const importString = `${warningComment}\n${generationComment(new Date().toISOString())}\n\n${kyselyImport}`;
     return `${importString}\n\n${tableTypesString}\n\n${exportString.join("\n")}`;
 };
