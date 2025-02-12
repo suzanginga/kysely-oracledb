@@ -311,7 +311,7 @@ describe("generateDatabaseTypes", () => {
                 "\n\n" +
                 "export interface DB {" +
                 "\n" +
-                "user: User" +
+                "user: UserTable" +
                 "\n" +
                 "}",
         );
