@@ -4,22 +4,8 @@
 
 ## Installation
 
-#### npm
-
 ```bash
-npm install kysely-oracledb
-```
-
-#### pnpm
-
-```bash
-pnpm install kysely-oracledb
-```
-
-#### yarn
-
-```bash
-yarn add kysely-oracledb
+npm install kysely oracle-db kysely-oracledb
 ```
 
 ## Usage
@@ -79,10 +65,34 @@ const products = await db
 
 The dialect can be configured by passing in the following options:
 
-| Option   | Type            | Description                         | Required |
-| -------- | --------------- | ----------------------------------- | -------- |
-| `pool`   | `oracledb.Pool` | Oracle DB connection pool.          | Yes      |
-| `logger` | `Logger`        | Logger instance for debug messages. | No       |
+| Option           | Type                      | Description                          | Required |
+| ---------------- | ------------------------- | ------------------------------------ | -------- |
+| `pool`           | `oracledb.Pool`           | Oracle DB connection pool.           | Yes      |
+| `logger`         | `Logger`                  | Logger instance for debug messages.  | No       |
+| `executeOptions` | `oracledb.ExecuteOptions` | Default options for `execute` calls. | No       |
+
+By default, queries will use `oracledb.OUT_FORMAT_OBJECT` to fetch rows as objects, and column names will be converted to lower case.
+
+If you want to convert columns and tables to use camel case, you can pass the `CamelCasePlugin` to Kysely:
+
+```typescript
+import type { DB } from "./types.ts";
+
+import oracledb from "oracledb";
+import { Kysely, CamelCasePlugin } from "kysely";
+import { OracleDialect } from "kysely-oracledb";
+
+const db = new Kysely<DB>({
+    dialect: new OracleDialect({
+        pool: await oracledb.createPool({
+            user: "user",
+            password: "pass",
+            connectionString: "connection-string",
+        }),
+    }),
+    plugins: [new CamelCasePlugin()],
+});
+```
 
 ### Type Generation
 

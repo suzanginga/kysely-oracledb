@@ -1,14 +1,16 @@
 import { CompiledQuery, DatabaseConnection, QueryResult } from "kysely";
-import oracledb, { Connection } from "oracledb";
+import oracledb, { Connection, ExecuteOptions } from "oracledb";
 import { v4 as uuid } from "uuid";
 import { Logger } from "./logger";
 
 export class OracleConnection implements DatabaseConnection {
+    #executeOptions: ExecuteOptions;
     #connection: Connection;
     #identifier: string;
     #log: Logger;
 
-    constructor(connection: Connection, logger: Logger) {
+    constructor(connection: Connection, logger: Logger, executeOptions?: ExecuteOptions) {
+        this.#executeOptions = executeOptions || {};
         this.#connection = connection;
         this.#log = logger;
         this.#identifier = uuid();
@@ -24,6 +26,7 @@ export class OracleConnection implements DatabaseConnection {
                 metaData.name = metaData.name.toLowerCase();
                 return undefined;
             },
+            ...this.#executeOptions,
         });
         const endTime = new Date();
         this.#log.trace({ durationMs: endTime.getTime() - startTime.getTime() }, "Execution complete");
