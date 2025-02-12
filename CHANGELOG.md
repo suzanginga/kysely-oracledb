@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.7.0
+
+### Minor Changes
+
+- 8f9db16: added support for auto generated columns
+
 ## 1.6.6
 
 ### Patch Changes
