@@ -2,11 +2,11 @@ import fs from "fs";
 import { CamelCasePlugin, ColumnMetadata, Kysely, TableMetadata } from "kysely";
 import path from "path";
 import { format, Options } from "prettier";
-import { OracleDialect, OracleDialectConfig } from "../dialect/dialect";
-import { IntropsectorDB } from "../dialect/introspector";
-import { defaultLogger } from "../dialect/logger";
-import { typeMap } from "./map";
-import { camelCase, pascalCase } from "./utils";
+import { OracleDialect, OracleDialectConfig } from "../dialect/dialect.js";
+import { IntropsectorDB } from "../dialect/introspector.js";
+import { defaultLogger } from "../dialect/logger.js";
+import { typeMap } from "./map.js";
+import { camelCase, pascalCase } from "./utils.js";
 
 interface TableTypes {
     table: string;
@@ -15,7 +15,7 @@ interface TableTypes {
 }
 
 const warningComment = `// This file was generated automatically. Please don't edit it manually!`;
-const kyselyImport = `import type { Insertable, Selectable, Updateable } from 'kysely'`;
+const kyselyImport = `import type { Insertable, Selectable, Updateable, Generated } from 'kysely'`;
 const generationComment = (date: string) => `// Timestamp: ${date}`;
 
 export const generateFieldTypes = (fields: ColumnMetadata[], useCamelCase = false): string => {
@@ -28,7 +28,8 @@ export const generateFieldTypes = (fields: ColumnMetadata[], useCamelCase = fals
         if (field.isNullable) {
             types.push("null");
         }
-        return `${useCamelCase ? camelCase(field.name) : field.name}: ${types.join(" | ")}`;
+        const typesString = field.isAutoIncrementing ? `Generated<${types.join(" | ")}>` : types.join(" | ");
+        return `${useCamelCase ? camelCase(field.name) : field.name}: ${typesString}`;
     });
     return fieldStrings.join("\n");
 };

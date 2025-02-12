@@ -1,7 +1,7 @@
 import { CompiledQuery, DatabaseConnection, QueryResult } from "kysely";
 import oracledb, { Connection, ExecuteOptions } from "oracledb";
 import { v4 as uuid } from "uuid";
-import { Logger } from "./logger";
+import { Logger } from "./logger.js";
 
 export class OracleConnection implements DatabaseConnection {
     #executeOptions: ExecuteOptions;

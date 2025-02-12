@@ -1,8 +1,8 @@
 import { DatabaseConnection, Driver } from "kysely";
 import { Connection } from "oracledb";
-import { OracleConnection } from "./connection";
-import { OracleDialectConfig } from "./dialect";
-import { defaultLogger, Logger } from "./logger";
+import { OracleConnection } from "./connection.js";
+import { OracleDialectConfig } from "./dialect.js";
+import { defaultLogger, Logger } from "./logger.js";
 
 export class OracleDriver implements Driver {
     readonly #config: OracleDialectConfig;
