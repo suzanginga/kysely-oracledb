@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.7.1
+
+### Patch Changes
+
+- 9e8db98: added fix for database type not using table interface
+
 ## 1.7.0
 
 ### Minor Changes
