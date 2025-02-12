@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.6.6
+
+### Patch Changes
+
+- 8285ea7: added execute opts to dialect config
+
 ## 1.6.5
 
 ### Patch Changes
