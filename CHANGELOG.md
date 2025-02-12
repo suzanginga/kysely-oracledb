@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.7.2
+
+### Patch Changes
+
+- ab377a9: fix readme code example
+
 ## 1.7.1
 
 ### Patch Changes
