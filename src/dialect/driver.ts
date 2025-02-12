@@ -18,7 +18,11 @@ export class OracleDriver implements Driver {
 
     async acquireConnection(): Promise<DatabaseConnection> {
         this.#log.trace("Acquiring connection");
-        const connection = new OracleConnection((await this.#config.pool?.getConnection()) as Connection, this.#log);
+        const connection = new OracleConnection(
+            (await this.#config.pool?.getConnection()) as Connection,
+            this.#log,
+            this.#config.executeOptions,
+        );
         this.#connections.set(connection.identifier, connection);
         return connection;
     }

@@ -1,5 +1,5 @@
 import { DatabaseIntrospector, DefaultQueryCompiler, Dialect, DialectAdapter, Driver, Kysely } from "kysely";
-import { Pool } from "oracledb";
+import { ExecuteOptions, Pool } from "oracledb";
 import { Options } from "prettier";
 import { OracleAdapter } from "./adapter";
 import { OracleDriver } from "./driver";
@@ -18,6 +18,7 @@ export interface OracleDialectConfig {
         filePath?: string;
         prettierOptions?: Options;
     };
+    executeOptions?: ExecuteOptions;
 }
 
 export class OracleDialect implements Dialect {
