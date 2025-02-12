@@ -41,7 +41,7 @@
         "lint": "tsc",
         "test": "vitest --coverage",
         "release": "pnpm build && changeset publish",
-        "dev": "pnpm lint && node dist/local.js"
+        "dev": "pnpm lint && node dist/dev.js"
     },
     "devDependencies": {
         "@changesets/cli": "^2.27.12",

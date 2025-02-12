@@ -3,4 +3,3 @@ node_modules
 dist
 .env
 types.test.ts
-src/local.ts
