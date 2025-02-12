@@ -10,7 +10,7 @@ import {
     generateDatabaseTypes,
     generateFieldTypes,
     generateTableTypes,
-} from "./generate";
+} from "./generate.js";
 
 describe("generateFieldTypes", () => {
     it("should generate type string for single field", () => {
@@ -58,6 +58,19 @@ describe("generateFieldTypes", () => {
                 },
             ]),
         ).toBe("name: string | null");
+    });
+    it("should generate type string for identity field", () => {
+        expect(
+            generateFieldTypes([
+                {
+                    name: "id",
+                    dataType: "NUMBER",
+                    isNullable: false,
+                    hasDefaultValue: false,
+                    isAutoIncrementing: true,
+                },
+            ]),
+        ).toBe("id: Generated<number>");
     });
     it("should generate type string for camel case field", () => {
         expect(
@@ -122,7 +135,7 @@ describe("generate table types", () => {
                 types:
                     "interface UserTable {" +
                     "\n" +
-                    "id: number" +
+                    "id: Generated<number>" +
                     "\n" +
                     "name: string" +
                     "\n" +
@@ -194,7 +207,7 @@ describe("generate table types", () => {
                 types:
                     "interface UserTable {" +
                     "\n" +
-                    "id: number" +
+                    "id: Generated<number>" +
                     "\n" +
                     "name: string" +
                     "\n" +
@@ -212,7 +225,7 @@ describe("generate table types", () => {
                 types:
                     "interface ProductTable {" +
                     "\n" +
-                    "id: number" +
+                    "id: Generated<number>" +
                     "\n" +
                     "product: string" +
                     "\n" +
@@ -262,7 +275,7 @@ describe("generate table types", () => {
                 types:
                     "interface UserProfileTable {" +
                     "\n" +
-                    "id: number" +
+                    "id: Generated<number>" +
                     "\n" +
                     "name: string" +
                     "\n" +
@@ -292,7 +305,7 @@ describe("generateDatabaseTypes", () => {
                 "\n" +
                 "// Timestamp: 2025-01-01T00:00:00.000Z" +
                 "\n\n" +
-                "import type { Insertable, Selectable, Updateable } from 'kysely'" +
+                "import type { Insertable, Selectable, Updateable, Generated } from 'kysely'" +
                 "\n\n" +
                 "types string" +
                 "\n\n" +

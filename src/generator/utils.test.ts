@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { camelCase, pascalCase } from "./utils";
+import { camelCase, pascalCase } from "./utils.js";
 
 describe("camelCase", () => {
     it("should convert snake_case to camelCase", () => {

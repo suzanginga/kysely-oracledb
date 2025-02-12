@@ -1,11 +1,11 @@
 import { DatabaseIntrospector, DefaultQueryCompiler, Dialect, DialectAdapter, Driver, Kysely } from "kysely";
 import { ExecuteOptions, Pool } from "oracledb";
 import { Options } from "prettier";
-import { OracleAdapter } from "./adapter";
-import { OracleDriver } from "./driver";
-import { IntropsectorDB, OracleIntrospector } from "./introspector";
-import { Logger } from "./logger";
-import { OracleQueryCompiler } from "./query-compiler";
+import { OracleAdapter } from "./adapter.js";
+import { OracleDriver } from "./driver.js";
+import { IntropsectorDB, OracleIntrospector } from "./introspector.js";
+import { Logger } from "./logger.js";
+import { OracleQueryCompiler } from "./query-compiler.js";
 
 export interface OracleDialectConfig {
     pool: Pool;

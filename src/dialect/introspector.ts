@@ -7,7 +7,7 @@ import {
     Selectable,
     TableMetadata,
 } from "kysely";
-import { OracleDialectConfig } from "./dialect";
+import { OracleDialectConfig } from "./dialect.js";
 
 export interface AllUsersTable {
     username: string;
@@ -25,6 +25,7 @@ export interface AllTabColumnsTable {
     dataType: string;
     nullable: string;
     dataDefault: string | null;
+    identityColumn: string;
 }
 
 export interface IntropsectorDB {
@@ -80,7 +81,7 @@ export class OracleIntrospector implements DatabaseIntrospector {
         }
         const rawColumns = await this.#db
             .selectFrom("allTabColumns")
-            .select(["owner", "tableName", "columnName", "dataType", "nullable", "dataDefault"])
+            .select(["owner", "tableName", "columnName", "dataType", "nullable", "dataDefault", "identityColumn"])
             .where("owner", "in", [...schemas, dualTable.owner])
             .where(
                 "tableName",
@@ -96,7 +97,7 @@ export class OracleIntrospector implements DatabaseIntrospector {
                     dataType: col.dataType,
                     isNullable: col.nullable === "Y",
                     hasDefaultValue: col.dataDefault !== null,
-                    isAutoIncrementing: false, // Oracle doesn't have auto incrementing columns
+                    isAutoIncrementing: col.identityColumn === "YES",
                 }));
             return { schema: table.owner, name: table.tableName, isView: false, columns };
         });
