@@ -30,7 +30,10 @@ export class OracleConnection implements DatabaseConnection {
         });
         const endTime = new Date();
         this.#log.trace({ durationMs: endTime.getTime() - startTime.getTime() }, "Execution complete");
-        return { rows: result?.rows || [] };
+        return {
+            rows: result?.rows || [],
+            numAffectedRows: result.rowsAffected ? BigInt(result.rowsAffected) : undefined,
+        };
     }
 
     formatQuery(query: CompiledQuery) {
