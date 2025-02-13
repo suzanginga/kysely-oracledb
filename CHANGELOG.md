@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.7.3
+
+### Patch Changes
+
+- f2c2681: added fix for bind param indexing issue
+
 ## 1.7.2
 
 ### Patch Changes
