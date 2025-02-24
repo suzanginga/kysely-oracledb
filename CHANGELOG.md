@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.8.1
+
+### Patch Changes
+
+- 4f4639d: fixed issue with view type generation
+
 ## 1.8.0
 
 ### Minor Changes
