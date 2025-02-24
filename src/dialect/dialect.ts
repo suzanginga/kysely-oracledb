@@ -1,4 +1,4 @@
-import { DatabaseIntrospector, DefaultQueryCompiler, Dialect, DialectAdapter, Driver, Kysely } from "kysely";
+import { Dialect, Kysely } from "kysely";
 import { ExecuteOptions, Pool } from "oracledb";
 import { Options } from "prettier";
 import { OracleAdapter } from "./adapter.js";
@@ -13,6 +13,7 @@ export interface OracleDialectConfig {
     generator?: {
         schemas?: string[];
         tables?: string[];
+        views?: string[];
         camelCase?: boolean;
         checkDiff?: boolean;
         filePath?: string;
@@ -28,19 +29,19 @@ export class OracleDialect implements Dialect {
         this.#config = config;
     }
 
-    createDriver(): Driver {
+    createDriver(): OracleDriver {
         return new OracleDriver(this.#config);
     }
 
-    createAdapter(): DialectAdapter {
+    createAdapter(): OracleAdapter {
         return new OracleAdapter();
     }
 
-    createIntrospector(db: Kysely<IntropsectorDB>): DatabaseIntrospector {
+    createIntrospector(db: Kysely<IntropsectorDB>): OracleIntrospector {
         return new OracleIntrospector(db, this.#config);
     }
 
-    createQueryCompiler(): DefaultQueryCompiler {
+    createQueryCompiler(): OracleQueryCompiler {
         return new OracleQueryCompiler();
     }
 }

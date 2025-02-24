@@ -18,6 +18,11 @@ export interface AllTablesTable {
     tableName: string;
 }
 
+export interface AllViewsTable {
+    owner: string;
+    viewName: string;
+}
+
 export interface AllTabColumnsTable {
     owner: string;
     tableName: string;
@@ -31,6 +36,7 @@ export interface AllTabColumnsTable {
 export interface IntropsectorDB {
     allUsers: Selectable<AllUsersTable>;
     allTables: Selectable<AllTablesTable>;
+    allViews: Selectable<AllViewsTable>;
     allTabColumns: Selectable<AllTabColumnsTable>;
 }
 
@@ -104,9 +110,48 @@ export class OracleIntrospector implements DatabaseIntrospector {
         return tables;
     }
 
+    async getViews(_options?: DatabaseMetadataOptions): Promise<TableMetadata[]> {
+        const schemas = (await this.getSchemas()).map((it) => it.name);
+        const rawViews = await this.#db
+            .selectFrom("allViews")
+            .select(["owner", "viewName"])
+            .where("owner", "in", schemas)
+            .where((eb) =>
+                eb.or([
+                    eb(eb.val(this.#config?.generator?.views?.length ?? 0), "=", eb.val(0)),
+                    eb("viewName", "in", this.#config?.generator?.views ?? [null]),
+                ]),
+            )
+            .fetch(999) // Oracle has a limit of 999 parameters for the IN clause
+            .execute();
+        const rawColumns = await this.#db
+            .selectFrom("allTabColumns")
+            .select(["owner", "tableName", "columnName", "dataType", "nullable", "dataDefault", "identityColumn"])
+            .where("owner", "in", schemas)
+            .where(
+                "tableName",
+                "in",
+                rawViews.map((view) => view.viewName),
+            )
+            .execute();
+        const views = rawViews.map((view) => {
+            const columns = rawColumns
+                .filter((col) => col.owner === view.owner && col.tableName === view.viewName)
+                .map((col) => ({
+                    name: col.columnName,
+                    dataType: col.dataType,
+                    isNullable: col.nullable === "Y",
+                    hasDefaultValue: col.dataDefault !== null,
+                    isAutoIncrementing: col.identityColumn === "YES",
+                }));
+            return { schema: view.owner, name: view.viewName, isView: true, columns };
+        });
+        return views;
+    }
+
     async getMetadata(_options?: DatabaseMetadataOptions): Promise<DatabaseMetadata> {
         return {
-            tables: await this.getTables(),
+            tables: [...(await this.getTables()), ...(await this.getViews())],
         };
     }
 }
