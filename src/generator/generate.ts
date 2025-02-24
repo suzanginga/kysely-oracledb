@@ -89,12 +89,25 @@ export const checkDiff = (existingContent: string, newContent: string) => {
 
 export const generate = async (config: OracleDialectConfig) => {
     const log = config.logger ? config.logger : defaultLogger;
+    const type = config.generator?.type ?? "tables";
     try {
         const dialect = new OracleDialect(config);
         const db = new Kysely<IntropsectorDB>({ dialect, plugins: [new CamelCasePlugin()] });
         const introspector = dialect.createIntrospector(db);
 
-        const tables = await introspector.getTables();
+        let tables;
+
+        switch (type) {
+            case "tables":
+                tables = await introspector.getTables();
+                break;
+            case "views":
+                tables = await introspector.getViews();
+                break;
+            case "all":
+                tables = [...(await introspector.getTables()), ...(await introspector.getViews())];
+                break;
+        }
 
         const tableTypes = generateTableTypes(tables, config.generator?.camelCase);
         const databaseTypes = generateDatabaseTypes(tableTypes);

@@ -11,6 +11,7 @@ export interface OracleDialectConfig {
     pool: Pool;
     logger?: Logger;
     generator?: {
+        type?: "tables" | "views" | "all";
         schemas?: string[];
         tables?: string[];
         views?: string[];
