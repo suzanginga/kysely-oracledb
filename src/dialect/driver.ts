@@ -17,35 +17,39 @@ export class OracleDriver implements Driver {
     async init(): Promise<void> {}
 
     async acquireConnection(): Promise<DatabaseConnection> {
-        this.#log.trace("Acquiring connection");
+        this.#log.debug("Acquiring connection");
         const connection = new OracleConnection(
             (await this.#config.pool?.getConnection()) as Connection,
             this.#log,
             this.#config.executeOptions,
         );
         this.#connections.set(connection.identifier, connection);
+        this.#log.debug({ id: connection.identifier }, "Connection acquired");
         return connection;
     }
 
-    async beginTransaction(_connection: DatabaseConnection): Promise<void> {
-        throw new Error("Not implemented");
+    async beginTransaction(connection: OracleConnection): Promise<void> {
+        this.#log.debug({ id: connection.identifier }, "Beginning transaction");
     }
 
-    async commitTransaction(_connection: DatabaseConnection): Promise<void> {
-        throw new Error("Not implemented");
+    async commitTransaction(connection: OracleConnection): Promise<void> {
+        await connection.connection.commit();
+        this.#log.debug({ id: connection.identifier }, "Transaction committed");
     }
 
-    async rollbackTransaction(_connection: DatabaseConnection): Promise<void> {
-        throw new Error("Not implemented");
+    async rollbackTransaction(connection: OracleConnection): Promise<void> {
+        await connection.connection.rollback();
+        this.#log.debug({ id: connection.identifier }, "Transaction rolled back");
     }
 
     async releaseConnection(connection: OracleConnection): Promise<void> {
-        this.#log.trace("Releasing connection");
+        this.#log.debug({ id: connection.identifier }, "Releasing connection");
         try {
             await this.#connections.get(connection.identifier)?.connection.close();
             this.#connections.delete(connection.identifier);
+            this.#log.debug({ id: connection.identifier }, "Connection released");
         } catch (err) {
-            this.#log.error({ err }, "Error closing connection");
+            this.#log.error({ id: connection.identifier, err }, "Error closing connection");
         }
     }
 

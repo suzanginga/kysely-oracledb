@@ -29,7 +29,7 @@ export class OracleConnection implements DatabaseConnection {
             ...this.#executeOptions,
         });
         const endTime = new Date();
-        this.#log.trace({ durationMs: endTime.getTime() - startTime.getTime() }, "Execution complete");
+        this.#log.debug({ durationMs: endTime.getTime() - startTime.getTime() }, "Execution complete");
         return {
             rows: result?.rows || [],
             numAffectedRows: result.rowsAffected ? BigInt(result.rowsAffected) : undefined,
