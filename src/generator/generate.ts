@@ -101,13 +101,13 @@ export const generate = async (config: OracleDialectConfig) => {
 
         const formattedTypes = await formatTypes(databaseTypes, config?.generator?.prettierOptions);
 
-        const filePath = config.generator?.filePath || path.join(process.cwd(), "types.test.ts");
+        const filePath = config.generator?.filePath || path.join(process.cwd(), "types.ts");
 
         if (config.generator?.checkDiff) {
             let diff = true;
             try {
                 const existingTypes = readFromFile(filePath);
-                const diff = checkDiff(existingTypes, formattedTypes);
+                diff = checkDiff(existingTypes, formattedTypes);
                 if (diff) {
                     log.warn("Types have changed. Updating types file...");
                 }
