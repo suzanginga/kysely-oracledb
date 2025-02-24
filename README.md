@@ -136,12 +136,16 @@ The generator can be configured with the same options as the dialect, plus the f
 
 | Option            | Type               | Description                                                     | Required |
 | ----------------- | ------------------ | --------------------------------------------------------------- | -------- |
+| `type`            | `string`           | Type of generation to perform.                                  | No       |
 | `schemas`         | `string[]`         | List of schemas to scope type generation.                       | No       |
 | `tables`          | `string[]`         | List of tables to scope type generation.                        | No       |
+| `views`           | `string[]`         | List of views to scope type generation.                         | No       |
 | `camelCase`       | `boolean`          | Convert database table names and columns to camel case.         | No       |
 | `checkDiff`       | `boolean`          | Check for differences against existing types before generating. | No       |
 | `filePath`        | `string`           | File path to write the types to.                                | No       |
 | `prettierOptions` | `prettier.Options` | Prettier options for formatting.                                | No       |
+
+By default only table types are generated. You can also generate view types by setting the `type` option to `"view"`, or both table and view types by setting the `type` option to `"all"`.
 
 By default the types will be written to `types.ts` in the current working directory. You can change this with the `filePath` option:
 
