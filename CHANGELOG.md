@@ -1,5 +1,15 @@
 # kysely-oracledb
 
+## 1.8.0
+
+### Minor Changes
+
+- 0790169: added support for transactions and introspecting views
+
+### Patch Changes
+
+- 0790169: fixed incorrect generator message when types haven't changed
+
 ## 1.7.4
 
 ### Patch Changes
