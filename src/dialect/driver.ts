@@ -1,4 +1,4 @@
-import { DatabaseConnection, Driver } from "kysely";
+import { Driver } from "kysely";
 import { Connection } from "oracledb";
 import { OracleConnection } from "./connection.js";
 import { OracleDialectConfig } from "./dialect.js";
@@ -16,7 +16,7 @@ export class OracleDriver implements Driver {
 
     async init(): Promise<void> {}
 
-    async acquireConnection(): Promise<DatabaseConnection> {
+    async acquireConnection(): Promise<OracleConnection> {
         this.#log.debug("Acquiring connection");
         const connection = new OracleConnection(
             (await this.#config.pool?.getConnection()) as Connection,
@@ -58,5 +58,9 @@ export class OracleDriver implements Driver {
             await this.releaseConnection(connection as OracleConnection);
         }
         await this.#config.pool?.close();
+    }
+
+    getConnection(id: string) {
+        return this.#connections.get(id.toString());
     }
 }
