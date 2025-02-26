@@ -72,11 +72,11 @@ export const formatTypes = async (types: string, options?: Options): Promise<str
         },
     );
 
-const writeToFile = (types: string, path: string) => {
+export const writeToFile = (types: string, path: string) => {
     fs.writeFileSync(path, types);
 };
 
-const readFromFile = (path: string) => {
+export const readFromFile = (path: string) => {
     return fs.readFileSync(path, "utf8");
 };
 

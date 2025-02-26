@@ -380,11 +380,30 @@ describe("generate", () => {
                         },
                     ]),
                 ),
+                getViews: vi.fn(async () =>
+                    Promise.resolve([
+                        {
+                            name: "VIEW",
+                            isView: true,
+                            columns: [
+                                {
+                                    owner: "SYS",
+                                    tableName: "VIEW",
+                                    columnName: "DUMMY",
+                                    dataType: "VARCHAR2",
+                                    nullable: "Y",
+                                    dataDefault: null,
+                                },
+                            ],
+                            schema: "SYS",
+                        },
+                    ]),
+                ),
             };
         });
         return { OracleDialect };
     });
-    it("should generate types for a single table", async () => {
+    it("should generate types and write to file", async () => {
         const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "types.ts");
         expect(fs.existsSync(filePath)).toBe(false);
         await generate({
@@ -401,5 +420,98 @@ describe("generate", () => {
         expect(fs.existsSync(filePath)).toBe(true);
         fs.unlinkSync(filePath);
         expect(fs.existsSync(filePath)).toBe(false);
+    });
+    it("should generate types when checkDiff is false", async () => {
+        vi.spyOn(fs, "writeFileSync").mockReturnValue();
+
+        await generate({
+            pool: await oracledb.createPool({
+                user: process.env.DB_USER,
+            }),
+            generator: {
+                schemas: ["SYS"],
+                tables: ["DUAL"],
+                checkDiff: false,
+            },
+        });
+
+        expect(fs.writeFileSync).toHaveBeenCalled();
+    });
+    it("should generate types for a single table", async () => {
+        vi.spyOn(fs, "writeFileSync").mockReturnValue();
+
+        await generate({
+            pool: await oracledb.createPool({
+                user: process.env.DB_USER,
+            }),
+            generator: {
+                schemas: ["SYS"],
+                tables: ["DUAL"],
+                checkDiff: true,
+            },
+        });
+
+        expect(fs.writeFileSync).toHaveBeenCalled();
+    });
+    it("should generate types for a single view", async () => {
+        vi.spyOn(fs, "writeFileSync").mockReturnValue();
+
+        await generate({
+            pool: await oracledb.createPool({
+                user: process.env.DB_USER,
+            }),
+            generator: {
+                type: "views",
+                schemas: ["SYS"],
+                views: ["VIEW"],
+                checkDiff: true,
+            },
+        });
+
+        expect(fs.writeFileSync).toHaveBeenCalled();
+    });
+    it("should generate types for tables and views", async () => {
+        vi.spyOn(fs, "writeFileSync").mockReturnValue();
+
+        await generate({
+            pool: await oracledb.createPool({
+                user: process.env.DB_USER,
+            }),
+            generator: {
+                type: "all",
+                schemas: ["SYS"],
+                tables: ["DUAL"],
+                views: ["VIEW"],
+                checkDiff: true,
+            },
+        });
+
+        expect(fs.writeFileSync).toHaveBeenCalled();
+    });
+    it("should accept a logger as a config option", async () => {
+        vi.spyOn(fs, "writeFileSync").mockReturnValue();
+
+        const logger = {
+            fatal: vi.fn(),
+            error: vi.fn(),
+            debug: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+            trace: vi.fn(),
+        };
+
+        await generate({
+            pool: await oracledb.createPool({
+                user: process.env.DB_USER,
+            }),
+            logger,
+            generator: {
+                schemas: ["SYS"],
+                tables: ["DUAL"],
+                checkDiff: true,
+            },
+        });
+
+        expect(logger.info).toHaveBeenCalled();
     });
 });
