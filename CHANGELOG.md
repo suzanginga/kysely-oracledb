@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.8.2
+
+### Patch Changes
+
+- 114eac1: added more unit tests
+
 ## 1.8.1
 
 ### Patch Changes
