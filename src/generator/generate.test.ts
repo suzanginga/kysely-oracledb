@@ -294,7 +294,7 @@ describe("generate table types", () => {
 describe("generateDatabaseTypes", () => {
     beforeEach(() => {
         vi.useFakeTimers();
-        vi.setSystemTime(new Date(2025, 0, 1));
+        vi.setSystemTime(new Date(Date.UTC(2025, 0, 1)));
     });
     afterEach(() => {
         vi.useRealTimers();
