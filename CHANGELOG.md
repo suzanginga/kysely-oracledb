@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.8.4
+
+### Patch Changes
+
+- 01fbc4a: fixed issue with system views with \_$ format
+
 ## 1.8.3
 
 ### Patch Changes
