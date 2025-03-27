@@ -1,5 +1,12 @@
 # kysely-oracledb
 
+## 1.8.3
+
+### Patch Changes
+
+- 2b537ac: added fix for columns with symbols in
+- c37ccc1: Added TIMESTAMP(6) type map
+
 ## 1.8.2
 
 ### Patch Changes
