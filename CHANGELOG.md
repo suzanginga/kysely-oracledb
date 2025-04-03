@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.8.5
+
+### Patch Changes
+
+- d46258d: added length, precision, and scale attributes to introspector metadata
+
 ## 1.8.4
 
 ### Patch Changes
