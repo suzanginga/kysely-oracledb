@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.8.6
+
+### Patch Changes
+
+- 53545f6: use Kysely ColumnType for date fields to allow correct insert type
+
 ## 1.8.5
 
 ### Patch Changes
