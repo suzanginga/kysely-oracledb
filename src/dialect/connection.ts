@@ -32,7 +32,7 @@ export class OracleConnection implements DatabaseConnection {
         this.#log.debug({ durationMs: endTime.getTime() - startTime.getTime() }, "Execution complete");
         return {
             rows: result?.rows || [],
-            insertId: result?.lastRowid ? BigInt(result.lastRowid) : undefined,
+            insertId: result?.lastRowid ? (result.lastRowid as unknown as bigint) : undefined, // lastRowid is a string in Oracle, but must be a bigint in Kysely
             numAffectedRows: result.rowsAffected ? BigInt(result.rowsAffected) : undefined,
         };
     }
