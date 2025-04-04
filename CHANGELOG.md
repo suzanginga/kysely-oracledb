@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.8.7
+
+### Patch Changes
+
+- 0aac09e: added insertid to execute result
+
 ## 1.8.6
 
 ### Patch Changes
