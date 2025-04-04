@@ -32,6 +32,7 @@ export class OracleConnection implements DatabaseConnection {
         this.#log.debug({ durationMs: endTime.getTime() - startTime.getTime() }, "Execution complete");
         return {
             rows: result?.rows || [],
+            insertId: result?.lastRowid ? BigInt(result.lastRowid) : undefined,
             numAffectedRows: result.rowsAffected ? BigInt(result.rowsAffected) : undefined,
         };
     }
