@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.8.8
+
+### Patch Changes
+
+- d9eaa86: fixed insertid conversion issue by casting string as bigint to support Oracle syntax
+
 ## 1.8.7
 
 ### Patch Changes
