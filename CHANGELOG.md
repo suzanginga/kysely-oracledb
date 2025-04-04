@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.8.9
+
+### Patch Changes
+
+- 57891dd: removing insertid for now as kysely doesn't support Oracle syntax
+
 ## 1.8.8
 
 ### Patch Changes
