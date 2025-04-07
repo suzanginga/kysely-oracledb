@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.8.10
+
+### Patch Changes
+
+- 1129699: added connection id to execution logs and added error logs
+
 ## 1.8.9
 
 ### Patch Changes
