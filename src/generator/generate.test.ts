@@ -3,6 +3,7 @@ import oracledb from "oracledb";
 import path from "path";
 import { fileURLToPath } from "url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { mockedWrite } from "../__mocks__/fs.js";
 import {
     checkDiff,
     formatTypes,
@@ -418,7 +419,6 @@ describe("generate", () => {
     });
     it("should generate types and write to file", async () => {
         const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "types.ts");
-        expect(fs.existsSync(filePath)).toBe(false);
         await generate({
             pool: await oracledb.createPool({
                 user: process.env.DB_USER,
@@ -430,9 +430,7 @@ describe("generate", () => {
                 filePath: filePath,
             },
         });
-        expect(fs.existsSync(filePath)).toBe(true);
-        fs.unlinkSync(filePath);
-        expect(fs.existsSync(filePath)).toBe(false);
+        expect(mockedWrite).toHaveBeenCalledTimes(1);
     });
     it("should generate types when checkDiff is false", async () => {
         vi.spyOn(fs, "writeFileSync").mockReturnValue();
@@ -526,5 +524,23 @@ describe("generate", () => {
         });
 
         expect(logger.info).toHaveBeenCalled();
+    });
+    it("should generate metadata and write to file", async () => {
+        const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "types.ts");
+        const metadataFilePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "tables.json");
+        await generate({
+            pool: await oracledb.createPool({
+                user: process.env.DB_USER,
+            }),
+            generator: {
+                schemas: ["SYS"],
+                tables: ["DUAL"],
+                checkDiff: true,
+                metadata: true,
+                filePath,
+                metadataFilePath,
+            },
+        });
+        expect(mockedWrite).toHaveBeenCalledTimes(2);
     });
 });
