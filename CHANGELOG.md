@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 1.9.0
+
+### Minor Changes
+
+- 0c2f21f: added new generator options to allow table metadata generation in addition to db types
+
 ## 1.8.10
 
 ### Patch Changes
