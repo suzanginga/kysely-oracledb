@@ -319,7 +319,7 @@ describe("generateDatabaseTypes", () => {
                 "\n" +
                 "// Timestamp: 2025-01-01T00:00:00.000Z" +
                 "\n\n" +
-                "import type { Insertable, Selectable, Updateable, Generated, ColumnType } from 'kysely'" +
+                "import type { Insertable, Selectable, Updateable, Generated } from 'kysely'" +
                 "\n\n" +
                 "types string" +
                 "\n\n" +
