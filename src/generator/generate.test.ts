@@ -73,7 +73,7 @@ describe("generateFieldTypes", () => {
             ]),
         ).toBe("'id': Generated<number>");
     });
-    it("should generate type string for date", () => {
+    it("should generate type for date", () => {
         expect(
             generateFieldTypes([
                 {
@@ -84,7 +84,7 @@ describe("generateFieldTypes", () => {
                     isAutoIncrementing: false,
                 },
             ]),
-        ).toBe("'date': ColumnType<string, Date, Date>");
+        ).toBe("'date': Date");
     });
     it("should generate type string for camel case field", () => {
         expect(
