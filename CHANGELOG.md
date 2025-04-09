@@ -1,5 +1,11 @@
 # kysely-oracledb
 
+## 2.0.1
+
+### Patch Changes
+
+- 9797c4a: removed unused import for column type from generator file
+
 ## 2.0.0
 
 ### Major Changes
