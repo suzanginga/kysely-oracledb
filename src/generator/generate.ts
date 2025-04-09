@@ -15,7 +15,7 @@ interface TableTypes {
 }
 
 const warningComment = `// This file was generated automatically. Please don't edit it manually!`;
-const kyselyImport = `import type { Insertable, Selectable, Updateable, Generated, ColumnType } from 'kysely'`;
+const kyselyImport = `import type { Insertable, Selectable, Updateable, Generated } from 'kysely'`;
 const generationComment = (date: string) => `// Timestamp: ${date}`;
 
 export const generateFieldTypes = (fields: ColumnMetadata[], useCamelCase = false): string => {
