@@ -15,7 +15,8 @@ interface TableTypes {
 }
 
 const warningComment = `// This file was generated automatically. Please don't edit it manually!`;
-const kyselyImport = `import type { Insertable, Selectable, Updateable, Generated } from 'kysely'`;
+const kyselyImport = `import type { Generated, Insertable, Selectable, Updateable } from 'kysely'`;
+const kyselyImportNoGen = `import type { Insertable, Selectable, Updateable } from 'kysely'`;
 const generationComment = (date: string) => `// Timestamp: ${date}`;
 
 export const generateFieldTypes = (fields: ColumnMetadata[], useCamelCase = false): string => {
@@ -50,11 +51,12 @@ export const generateTableTypes = (tables: TableMetadata[], useCamelCase = false
     });
 };
 
-export const generateDatabaseTypes = (tableTypes: TableTypes[]): string => {
+export const generateDatabaseTypes = (tableTypes: TableTypes[], hasGeneratedField = false): string => {
+    const kyeslyImports = hasGeneratedField ? kyselyImport : kyselyImportNoGen;
     const tableTypesString = tableTypes.map(({ types }) => types).join("\n\n");
     const exportString = ["export interface DB {"];
     exportString.push(...tableTypes.map(({ table, tableTypeName }) => `${table}: ${tableTypeName}Table`), "}");
-    const importString = `${warningComment}\n${generationComment(new Date().toISOString())}\n\n${kyselyImport}`;
+    const importString = `${warningComment}\n${generationComment(new Date().toISOString())}\n\n${kyeslyImports}`;
     return `${importString}\n\n${tableTypesString}\n\n${exportString.join("\n")}`;
 };
 
@@ -122,8 +124,12 @@ export const generate = async (config: OracleDialectConfig) => {
                 break;
         }
 
+        tables = tables.sort((a, b) => a.name.localeCompare(b.name));
+
+        const hasGeneratedField = tables.some((table) => table.columns.some((column) => column.isAutoIncrementing));
+
         const tableTypes = generateTableTypes(tables, config.generator?.camelCase);
-        const databaseTypes = generateDatabaseTypes(tableTypes);
+        const databaseTypes = generateDatabaseTypes(tableTypes, hasGeneratedField);
 
         const formattedTypes = await formatTypes(databaseTypes, config?.generator?.prettierOptions);
 
