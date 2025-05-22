@@ -319,7 +319,24 @@ describe("generateDatabaseTypes", () => {
                 "\n" +
                 "// Timestamp: 2025-01-01T00:00:00.000Z" +
                 "\n\n" +
-                "import type { Insertable, Selectable, Updateable, Generated } from 'kysely'" +
+                "import type { Insertable, Selectable, Updateable } from 'kysely'" +
+                "\n\n" +
+                "types string" +
+                "\n\n" +
+                "export interface DB {" +
+                "\n" +
+                "user: UserTable" +
+                "\n" +
+                "}",
+        );
+    });
+    it("should generate database types for single table with generated field", () => {
+        expect(generateDatabaseTypes([{ table: "user", tableTypeName: "User", types: "types string" }], true)).toBe(
+            "// This file was generated automatically. Please don't edit it manually!" +
+                "\n" +
+                "// Timestamp: 2025-01-01T00:00:00.000Z" +
+                "\n\n" +
+                "import type { Generated, Insertable, Selectable, Updateable } from 'kysely'" +
                 "\n\n" +
                 "types string" +
                 "\n\n" +
