@@ -11,7 +11,7 @@
     "exports": {
         ".": {
             "import": {
-                "types": "./dist/index.d.mts",
+                "types": "./dist/index.d.ts",
                 "default": "./dist/esm/index.js"
             },
             "require": {
@@ -56,7 +56,7 @@
         "uuid": "^11.0.5"
     },
     "peerDependencies": {
-        "kysely": "^0.27.5",
-        "oracledb": "^6.7.1"
+        "kysely": "^0.28.2",
+        "oracledb": "^6.8.0"
     }
 }
